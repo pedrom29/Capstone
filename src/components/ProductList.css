@@ -1,0 +1,52 @@
+.product-card {
+    min-height: 500px; /* Altura mínima para asegurar que todas las tarjetas tengan el mismo tamaño */
+    max-height: 500px; /* Aseguramos que la altura máxima sea la misma para todas */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center; /* Centramos el contenido */
+    padding: 15px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Añadimos una ligera sombra */
+  }
+  
+  .product-card img {
+    height: 200px; /* Mantiene la imagen proporcional y evita que se expanda demasiado */
+    object-fit: cover;
+    margin-bottom: 15px; /* Espacio inferior a la imagen */
+  }
+  
+  .product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1; /* Aseguramos que el contenido ocupe el espacio disponible */
+    overflow: hidden; /* Para evitar que el contenido se desborde */
+  }
+  
+  .product-card .card-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    white-space: nowrap; /* Para evitar que el título se expanda verticalmente */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Corta el título si es demasiado largo */
+  }
+  
+  .product-card .card-text {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Asegura que el texto de la descripción no se desborde */
+    white-space: nowrap; /* Evita que el texto crezca en varias líneas */
+  }
+  
+  .product-card .card-text strong {
+    font-size: 1.3rem;
+    color: #046b6f;
+  }
+  
+  .product-card button {
+    margin-top: 15px;
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+  

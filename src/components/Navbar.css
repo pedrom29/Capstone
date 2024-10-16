@@ -1,0 +1,32 @@
+.rounded-navbar {
+  background-color: #046b6f !important; /* Color personalizado */
+  border-radius: 15px; /* Mantiene las esquinas redondeadas */
+  z-index: 1000;
+  position: relative;
+  padding-left: 20px; /* Añade margen interno a la izquierda */
+  padding-right: 20px; /* Añade margen interno a la derecha */
+}
+
+.search-form {
+  display: flex;
+}
+
+.search-form input {
+  margin-right: 5px;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+}
+
+.nav-icons a {
+  color: white;
+  margin-left: 15px; /* Espacio entre los íconos */
+}
+
+@media (max-width: 991px) { /* Para pantallas más pequeñas */
+  .nav-icons {
+    margin-top: 10px; /* Añade un poco de margen en la vista móvil */
+  }
+}
