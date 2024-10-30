@@ -16,7 +16,7 @@ function Footer() {
             <ul className="list-unstyled">
               <li><a href="#home" className="text-white">Inicio</a></li>
               <li><a href="#jabon" className="text-white">Jabones</a></li>
-              <li><a href="#ofertas" className="text-white">Ofertas</a></li>
+              <li><a href="#blog" className="text-white">Blog</a></li>
               <li><a href="#contacto" className="text-white">Contacto</a></li>
             </ul>
           </Col>

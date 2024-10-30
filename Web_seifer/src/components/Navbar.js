@@ -1,44 +1,54 @@
 import React from 'react';
-import { Navbar, Nav, Form, FormControl, Button } from 'react-bootstrap';
-import { FaSearch, FaUser, FaShoppingCart } from 'react-icons/fa'; // Importamos los íconos necesarios
-import './Navbar.css'; // Archivo CSS para ajustes adicionales
+import { Navbar, Nav, Form, FormControl, Button, Container } from 'react-bootstrap';
+import { FaShoppingCart, FaUser, FaSearch } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
-function CustomNavbar() {
+function NavbarComponent() {
   return (
-    <Navbar  expand="lg" fixed="top" className="rounded-navbar">
-      <Navbar.Brand href="#home">
-        <img
-          src={`${process.env.PUBLIC_URL}/Logo.png`} // Ruta del logo
-          width="40"
-          height="40"
-          className="d-inline-block align-top"
-          alt="Seifer Logo"
-        />{' '}
-        SEIFER
-      </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
-        <Nav className="mr-auto">
-          <Nav.Link href="#jabon">Jabones</Nav.Link>
-          <Nav.Link href="#ofertas">Ofertas</Nav.Link>
-        </Nav>
-        <Form inline className="search-form">
-          <FormControl type="text" placeholder="Buscar" className="mr-sm-2" />
-          <Button variant="outline-info">
-            <FaSearch /> {/* Reemplaza el botón de texto por el ícono de lupa */}
-          </Button>
-        </Form>
-        <Nav className="ml-auto nav-icons"> {/* Este div controla los íconos */}
-          <Nav.Link href="#user">
-            <FaUser size={20} /> {/* Ícono de usuario */}
-          </Nav.Link>
-          <Nav.Link href="#cart">
-            <FaShoppingCart size={20} /> {/* Ícono de carrito de compras */}
-          </Nav.Link>
-        </Nav>
-      </Navbar.Collapse>
+    <Navbar expand="lg" style={{ backgroundColor: '#316c72', fontFamily: 'Arial, sans-serif' }}>
+      <Container className="align-items-center">
+        {/* Logo y Nombre */}
+        <Navbar.Brand as={Link} to="/" style={{ fontSize: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center' }}>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            style={{ width: '30px', height: '30px', marginRight: '10px' }}
+          />
+          SEIFER
+        </Navbar.Brand>
+        
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        
+        <Navbar.Collapse id="navbar-nav" className="justify-content-between">
+          <Nav className="me-auto">
+            <Nav.Link href="#jabones" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Jabones</Nav.Link>
+            <Nav.Link href="#ofertas" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Ofertas</Nav.Link>
+          </Nav>
+          
+          {/* Barra de búsqueda ampliada */}
+          <Form className="d-flex mx-auto" style={{ width: '60%' }}>
+            <FormControl
+              type="search"
+              placeholder="Buscar productos..."
+              className="me-2"
+              aria-label="Buscar"
+            />
+            <Button variant="outline-light"><FaSearch /></Button>
+          </Form>
+          
+          <Nav className="ms-auto">
+            {/* Enlace al login */}
+            <Nav.Link as={Link} to="/login" style={{ color: '#ffffff' }}>
+              <FaUser />
+            </Nav.Link>
+            <Nav.Link href="#cart" style={{ color: '#ffffff' }}>
+              <FaShoppingCart />
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
     </Navbar>
   );
 }
 
-export default CustomNavbar;
+export default NavbarComponent;
