@@ -6,7 +6,12 @@ import ProductList from './components/ProductList';
 import Footer from './components/Footer';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
-import { Container, Button, Row, Col } from 'react-bootstrap';
+import JabonesPage from './components/JabonesPage';
+import BlogPage from './components/BlogPage.js';
+import TermsPage from './components/TermsPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import CookiesPolicyPage from './components/CookiesPolicyPage';
+import { Container, Row, Col } from 'react-bootstrap';
 
 function HomePage() {
   return (
@@ -15,16 +20,6 @@ function HomePage() {
       <Row className="justify-content-center" style={{ marginTop: '0px' }}>
         <Col xs={12} md={11} lg={10}>
           <Banner />
-        </Col>
-      </Row>
-
-      {/* Botones de Jabones y Blog centrados y responsivos */}
-      <Row className="justify-content-center mt-2 mb-3">
-        <Col xs="auto">
-          <Button variant="primary" className="mx-1">Jabones</Button>
-        </Col>
-        <Col xs="auto">
-          <Button variant="secondary" className="mx-1">Blog</Button>
         </Col>
       </Row>
 
@@ -50,6 +45,11 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/jabones" element={<JabonesPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/condiciones" element={<TermsPage />} />
+        <Route path="/privacidad" element={<PrivacyPolicyPage />} />
+        <Route path="/cookies" element={<CookiesPolicyPage />} />
       </Routes>
 
       <Footer />

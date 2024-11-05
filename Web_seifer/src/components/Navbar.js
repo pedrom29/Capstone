@@ -21,8 +21,9 @@ function NavbarComponent() {
         
         <Navbar.Collapse id="navbar-nav" className="justify-content-between">
           <Nav className="me-auto">
-            <Nav.Link href="#jabones" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Jabones</Nav.Link>
-            <Nav.Link href="#ofertas" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Ofertas</Nav.Link>
+            <Nav.Link as={Link} to="/jabones" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Jabones</Nav.Link>
+            <Nav.Link as={Link} to="/ofertas" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Ofertas</Nav.Link>
+            <Nav.Link as={Link} to="/blog" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Blog</Nav.Link>
           </Nav>
           
           {/* Barra de búsqueda ampliada */}
@@ -41,7 +42,7 @@ function NavbarComponent() {
             <Nav.Link as={Link} to="/login" style={{ color: '#ffffff' }}>
               <FaUser />
             </Nav.Link>
-            <Nav.Link href="#cart" style={{ color: '#ffffff' }}>
+            <Nav.Link as={Link} to="/cart" style={{ color: '#ffffff' }}>
               <FaShoppingCart />
             </Nav.Link>
           </Nav>
