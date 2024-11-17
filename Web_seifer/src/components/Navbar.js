@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 function NavbarComponent() {
   return (
-    <Navbar expand="lg" style={{ backgroundColor: '#316c72', fontFamily: 'Arial, sans-serif' }}>
+    <Navbar expand="lg" fixed="top" style={{ backgroundColor: '#316c72', fontFamily: 'Arial, sans-serif' }}>
       <Container className="align-items-center">
         {/* Logo y Nombre */}
         <Navbar.Brand as={Link} to="/" style={{ fontSize: '1.5rem', color: '#ffffff', display: 'flex', alignItems: 'center' }}>
@@ -22,7 +22,6 @@ function NavbarComponent() {
         <Navbar.Collapse id="navbar-nav" className="justify-content-between">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/jabones" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Jabones</Nav.Link>
-            <Nav.Link as={Link} to="/ofertas" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Ofertas</Nav.Link>
             <Nav.Link as={Link} to="/blog" style={{ fontSize: '1.1rem', color: '#ffffff' }}>Blog</Nav.Link>
           </Nav>
           

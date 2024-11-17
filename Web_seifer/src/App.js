@@ -11,7 +11,9 @@ import BlogPage from './components/BlogPage.js';
 import TermsPage from './components/TermsPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import CookiesPolicyPage from './components/CookiesPolicyPage';
+import CartPage from './components/CartPage';
 import { Container, Row, Col } from 'react-bootstrap';
+
 
 function HomePage() {
   return (
@@ -37,7 +39,7 @@ function App() {
   const location = useLocation();
 
   return (
-    <div style={{ backgroundColor: '#d9d9d9', minHeight: '100vh', fontFamily: 'Roboto, sans-serif' }}>
+    <div style={{ backgroundColor: '#d9d9d9', minHeight: '100vh', fontFamily: 'Roboto, sans-serif', paddingTop: '56px' }}>
       {/* Mostrar CustomNavbar solo en la página principal */}
       {location.pathname === '/' && <CustomNavbar />}
 
@@ -50,6 +52,7 @@ function App() {
         <Route path="/condiciones" element={<TermsPage />} />
         <Route path="/privacidad" element={<PrivacyPolicyPage />} />
         <Route path="/cookies" element={<CookiesPolicyPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
 
       <Footer />
