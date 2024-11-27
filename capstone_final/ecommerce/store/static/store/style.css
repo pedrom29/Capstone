@@ -1,0 +1,19 @@
+/* styles.css */
+
+/* Estilo para cambiar el color de los enlaces de la navbar */
+.navbar-nav .nav-link {
+    color: #007bff; /* Cambia el color a azul */
+}
+
+.navbar-nav .nav-link:hover {
+    color: #0056b3; /* Cambia el color al pasar el ratón */
+}
+
+/* Estilo para darle más margen al main */
+main.container {
+    margin-top: 20px;
+}
+/* store/static/store/styles.css */
+body {
+    background-color: lightyellow; /* Solo para comprobar si el CSS se carga */
+}

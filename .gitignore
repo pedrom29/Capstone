@@ -1,0 +1,4 @@
+# Ignorar el archivo .env (variables sensibles)
+.env
+# Ignorar el archivo .env (variables sensibles)
+.env

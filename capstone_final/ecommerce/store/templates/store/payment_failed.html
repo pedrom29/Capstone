@@ -1,0 +1,16 @@
+{% extends "store/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center text-danger mb-4">El Pago no se completó</h1>
+    <div class="alert alert-danger text-center">
+        <p>Lo sentimos, pero hubo un problema con tu pago. Por favor, intenta nuevamente.</p>
+        <p><strong>Estado de la Transacción: Cancelado</strong> {{ status }}</p>        
+    </div>
+
+    <!-- Botón para volver a la página principal -->
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-primary">Volver a la Página Principal</a>
+    </div>
+</div>
+{% endblock %}

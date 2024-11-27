@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center text-success mb-4">¡Pago Realizado con Éxito!</h1>
+    <div class="alert alert-success">
+        <p>Gracias por tu compra. Tu pedido ha sido procesado correctamente.</p>
+        <p><strong>ID del Pedido:</strong> {{ buy_order }}</p>
+        <p><strong>Código de Autorización:</strong> {{ authorization_code }}</p>
+        <p><strong>Monto Pagado:</strong> ${{ amount }}</p>
+        <p><strong>Fecha de Transacción:</strong> {{ transaction_date }}</p>
+    </div>
+
+    <!-- Formulario para enviar la confirmación por correo -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">¿Deseas recibir la confirmación por correo?</h2>
+            <form action="{% url 'send_confirmation_email' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Correo Electrónico:</label>
+                    <input type="email" name="email" id="email" class="form-control" required>
+                </div>
+                <input type="hidden" name="buy_order" value="{{ buy_order }}">
+                <button type="submit" class="btn btn-primary">Enviar Confirmación</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón para descargar el PDF -->
+    <form action="{% url 'download_invoice_pdf' %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="buy_order" value="{{ buy_order }}">
+        <button type="submit" class="btn btn-secondary">Descargar Factura (PDF)</button>
+    </form>
+
+    <!-- Botón para volver a la página principal -->
+    <a href="/" class="btn btn-link">Volver a la página principal</a>
+</div>
+{% endblock %}

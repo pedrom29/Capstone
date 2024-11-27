@@ -1,0 +1,15 @@
+{% extends "store/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center text-success mb-4">¡Correo Enviado!</h1>
+    <div class="alert alert-info text-center">
+        <p>Hemos enviado una confirmación de tu compra al correo <strong>{{ email }}</strong>.</p>
+    </div>
+
+    <!-- Botón para volver a la página principal -->
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-primary">Volver a la Página Principal</a>
+    </div>
+</div>
+{% endblock %}
