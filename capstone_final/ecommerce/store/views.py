@@ -294,16 +294,6 @@ def download_invoice_pdf(request):
         p.save()
 
         return response
-    
-#def test_email(request):
-#    send_mail(
-#        'Prueba de Correo',  # Asunto
-#        'Este es un correo de prueba enviado desde mi proyecto Django.',  # Cuerpo del mensaje
-#        'tu_correo@gmail.com',  # Desde este correo (EMAIL_HOST_USER)
-#        ['pe.maturana29@gmail.com'],  # A este correo
-#        fail_silently=False,
-#    )
-#    return HttpResponse("Correo enviado exitosamente.")
 
 def react_view(request):
     return render(request, 'react_index.html')

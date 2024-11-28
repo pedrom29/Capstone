@@ -20,7 +20,7 @@ def register(request):
                 last_name=form.cleaned_data['last_name'],
             )
 
-            # La señal manejará la creación del perfil automáticamente
+          
 
             # Transferir el carrito del invitado al nuevo usuario
             session_id = request.session.session_key

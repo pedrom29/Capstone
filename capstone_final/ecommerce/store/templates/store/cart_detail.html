@@ -27,7 +27,7 @@
                                 <button type="submit" class="btn btn-success btn-sm">+</button>
                             </form>
 
-                            <!-- Botón Decrementar -->
+                            <!-- Botón Disminuir -->
                             <form action="{% url 'update_cart_item' item.id 'decrement' %}" method="post" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-warning btn-sm">-</button>

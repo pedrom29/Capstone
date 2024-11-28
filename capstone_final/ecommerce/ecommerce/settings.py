@@ -54,8 +54,8 @@ ROOT_URLCONF = 'ecommerce.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],  # Puedes agregar directorios globales aquí si necesitas
-        'APP_DIRS': True,  # Habilita la búsqueda de templates en aplicaciones
+        'DIRS': [],  
+        'APP_DIRS': True,  
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -83,13 +83,13 @@ import os
 
 STATIC_URL = '/static/'
 
-# Archivos estáticos que creas durante el desarrollo
+# Archivos estáticos 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'store/static'),  # Debe existir la carpeta store/static
 ]
 
-# Donde se recopilan los archivos estáticos cuando ejecutas collectstatic (para producción)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Evita usar el mismo nombre que en STATICFILES_DIRS
+# Donde se recopilan los archivos estáticos cuando ejecutas collectstatic 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Evitar usar el mismo nombre que en STATICFILES_DIRS
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -169,7 +169,7 @@ DATABASES = {
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'static/',  # Carpeta donde React guardará los archivos
+        'BUNDLE_DIR_NAME': 'static/',  
         'STATS_FILE': os.path.join(BASE_DIR, 'frontend/webpack-stats.json'),
     }
 }

@@ -19,7 +19,6 @@ urlpatterns = [
     path('cart/item/<int:item_id>/<str:action>/', views.update_cart_item, name='update_cart_item'),
     path('send_confirmation_email/', views.send_confirmation_email, name='send_confirmation_email'),
     path('download_invoice_pdf/', views.download_invoice_pdf, name='download_invoice_pdf'),
-    #path('test-email/', views.test_email, name='test_email'),
     path('', react_view, name='react_view'),  # Todas las rutas servirán React
     path('api/products/', product_list_json, name='product_list_json'),
     path('', views.base, name='home'),
