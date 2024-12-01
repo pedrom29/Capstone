@@ -1,11 +1,4 @@
 {% load static %}
-{% if messages %}
-<ul>
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
 
 <!DOCTYPE html>
 <html>
@@ -39,6 +32,8 @@
             <a href="{% url 'home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Logo Seifer">
         </div>
+        
+
     </div>
 </body>
 </html>

@@ -1,29 +1,43 @@
 {% extends "store/base.html" %}
+{% load custom_filters %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <!-- Imagen del Producto -->
+        <!-- Imagen del Producto con Zoom -->
         <div class="col-md-6">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid img-thumbnail mb-3" style="width: 100%; height: auto;">
+            <div class="zoom-container">
+                <img id="productImage" src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid img-thumbnail mb-3 zoom-image">
+            </div>
         </div>
 
         <!-- Detalles del Producto -->
         <div class="col-md-6">
             <h1 class="mb-4">{{ product.name }}</h1>
             <p class="lead">{{ product.description }}</p>
-            <p><strong>Precio:</strong> ${{ product.price }}</p>
-            <p><strong>Stock disponible:</strong> {{ product.stock }}</p>
+            <p><strong>Precio:</strong> <strong>${{ product.price|add_dot_separator }}</strong></p>
+            
 
             <!-- Botón para agregar al carrito -->
-            <form action="{% url 'add_to_cart' product.id %}" method="post" class="mb-3">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-lg">Agregar al Carro</button>
-            </form>
+            {% if product.stock > 0 %}
+                <form action="{% url 'add_to_cart' product.id %}" method="post" class="mb-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-lg">Agregar al Carro</button>
+                </form>
+            {% else %}
+                <p class="text-danger">Este producto no está disponible actualmente.</p>
+            {% endif %}
 
             <!-- Enlace para volver a la lista de productos -->
-            <a href="/" class="btn btn-secondary">Volver a la Lista de Productos</a>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Volver a la Lista de Productos</a>
         </div>
     </div>
 </div>
+
+<!-- Opcional: JS para manejar eventos adicionales -->
+<script>
+    document.getElementById("productImage").addEventListener("mouseover", function () {
+        this.style.cursor = "zoom-in";
+    });
+</script>
 {% endblock %}

@@ -1,18 +1,9 @@
 {% extends "store/base.html" %}
-
+{% load custom_filters %}
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Pagar Pedido</h1>
     
-    <!-- Información del Pedido -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <p><strong>Pedido ID:</strong> {{ order.id }}</p>
-            <p><strong>Total a Pagar:</strong> ${{ order.total }}</p>
-            <p><strong>Dirección de Entrega:</strong> {{ order.address }}, {{ order.comuna }}, {{ order.city }}</p>
-        </div>
-    </div>
-
     <!-- Productos del Pedido -->
     <h2 class="mb-3">Productos en el Pedido</h2>
     <ul class="list-group mb-4">
@@ -29,6 +20,15 @@
         </li>
         {% endfor %}
     </ul>
+    <!-- Información del Pedido -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Pedido ID:</strong> {{ order.id }}</p>
+            <p><strong>Total a Pagar:</strong> ${{ order.total|floatformat:0|add_dot_separator }}</p>
+            <p><strong>Dirección de Entrega:</strong> {{ order.address }}, {{ order.comuna }}, {{ order.city }}</p>
+        </div>
+    </div>
+
 
     <!-- Formulario para Iniciar Webpay -->
     <div class="text-center">

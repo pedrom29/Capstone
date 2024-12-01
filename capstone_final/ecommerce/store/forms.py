@@ -1,13 +1,14 @@
 from django import forms
 from django.contrib.auth.models import User
 from datetime import date, timedelta
+from store.models import Profile  # Asegúrate de que este modelo está definido
 
 class UserRegistrationForm(forms.ModelForm):
     first_name = forms.CharField(required=True, label="Nombre", max_length=30)
     last_name = forms.CharField(required=True, label="Apellidos", max_length=30)
     rut = forms.CharField(required=True, label="RUT", max_length=12)  # Campo obligatorio
     email = forms.EmailField(required=True, label="Correo Electrónico")
-    phone = forms.CharField(required=False, label="Teléfono", max_length=15)
+    phone = forms.CharField(required=True, label="Teléfono", max_length=15)
     password = forms.CharField(required=True, widget=forms.PasswordInput, label="Contraseña")
     confirm_password = forms.CharField(required=True, widget=forms.PasswordInput, label="Confirmar Contraseña")
 
@@ -23,7 +24,16 @@ class UserRegistrationForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError("Las contraseñas no coinciden.")
 
+        # Validación adicional para RUT
+        rut = cleaned_data.get("rut")
+        if rut:  # Solo validar si el RUT no es None
+            if not rut.isdigit() or len(rut) not in range(8, 13):
+                raise forms.ValidationError("El RUT debe contener entre 8 y 12 caracteres numéricos.")
+        else:
+            raise forms.ValidationError("El campo RUT es obligatorio.")
+
         return cleaned_data
+
 
 class OrderForm(forms.Form):
     address = forms.CharField(label="Dirección", max_length=255, required=True)

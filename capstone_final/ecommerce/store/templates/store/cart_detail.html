@@ -1,62 +1,66 @@
 {% extends "store/base.html" %}
-
+{% load custom_filters %}
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-5">Carro de Compras</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Productos en el Carrito</h1>
 
-    <div class="row">
-        {% for item in cart_items %}
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <!-- Imagen del Producto -->
-                <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}">
-                
-                <div class="card-body">
-                    <h5 class="card-title">{{ item.product.name }}</h5>
-                    <p class="card-text">
-                        Precio: ${{ item.product.price }} <br>
-                        Cantidad: {{ item.quantity }} <br>
-                        Total: ${{ item.get_total_price }}
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Botones de acción: Incrementar, Decrementar y Eliminar -->
-                        <div>
-                            <!-- Botón Incrementar -->
-                            <form action="{% url 'update_cart_item' item.id 'increment' %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-sm">+</button>
-                            </form>
-
-                            <!-- Botón Disminuir -->
-                            <form action="{% url 'update_cart_item' item.id 'decrement' %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-warning btn-sm">-</button>
-                            </form>
-
-                            <!-- Botón Eliminar -->
-                            <form action="{% url 'update_cart_item' item.id 'delete' %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </div>
+    <!-- Verificar si hay productos en el carrito -->
+    {% if cart_items %}
+        <!-- Lista de productos -->
+        <ul class="list-group mb-4">
+            {% for item in cart_items %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <!-- Sección de la imagen y nombre del producto -->
+                <div class="d-flex align-items-center">
+                    <!-- Imagen del Producto -->
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail mr-3" style="width: 60px; height: 60px; object-fit: cover;">
+                    <!-- Información del Producto -->
+                    <div>
+                        <strong>{{ item.product.name }}</strong><br>
+                        Precio: <strong>${{ item.product.price|add_dot_separator }}</strong><br>
+                        Cantidad: {{ item.quantity }}
                     </div>
                 </div>
-            </div>
+                <!-- Botones de acción y total del producto -->
+                <div class="d-flex flex-column align-items-end">
+                    <!-- Total del producto -->
+                    <strong><span class="mb-2">Total: ${{ item.get_total_price|floatformat:0|add_dot_separator }}</span></strong>
+                    <!-- Botones de acción -->
+                    <div class="d-flex">
+                        <form action="{% url 'update_cart_item' item.id 'increment' %}" method="post" class="mr-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">+</button>
+                        </form>
+                        <form action="{% url 'update_cart_item' item.id 'decrement' %}" method="post" class="mr-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">-</button>
+                        </form>
+                        <form action="{% url 'update_cart_item' item.id 'delete' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Total del carrito -->
+        <div class="text-right">
+            <h4>Total a Pagar: {{ total|add_dot_separator }}</h4>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- Mostrar el total -->
-    <div class="mt-5">
-        <h4>Total del Carrito: ${{ total }}</h4>
-    </div>
-
-    <!-- Botón Seguir Comprando -->
-    <a href="/" class="btn btn-secondary mt-3">Seguir Comprando</a>
-
-    <!-- Botón Realizar Pedido -->
-    {% if cart_items %}
-    <a href="{% url 'checkout' %}" class="btn btn-primary mt-3">Realizar Pedido</a>
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'product_list' %}" class="btn btn-secondary">Seguir Comprando</a>
+            <a href="{% url 'checkout' %}" class="btn btn-success">Continuar compra</a>
+        </div>
+    {% else %}
+        <!-- Mensaje si el carrito está vacío -->
+        <div class="text-center mt-5">
+            <p class="text-muted">Tu carrito está vacío. ¡Empieza a agregar productos ahora!</p>
+            <a href="{% url 'product_list' %}" class="btn btn-success">Ir a la tienda</a>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

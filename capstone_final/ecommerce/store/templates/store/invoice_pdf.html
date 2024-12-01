@@ -1,18 +1,109 @@
+{% load custom_filters %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .invoice-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .details p {
+            font-size: 16px;
+            color: #555555;
+            line-height: 1.6;
+        }
+        .products table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .products table th, .products table td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        .products table th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            font-size: 14px;
+            color: #999999;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Factura de Compra</h1>
-    <p><strong>ID del Pedido:</strong> {{ order.id }}</p>
-    <p><strong>Fecha:</strong> {{ order.created_at }}</p>
-    <p><strong>Total:</strong> ${{ order.total }}</p>
-    <h2>Productos:</h2>
-    <ul>
-        {% for item in order.items.all %}
-            <li>{{ item.product.name }} x {{ item.quantity }} - ${{ item.product.price * item.quantity }}</li>
-        {% endfor %}
-    </ul>
+    <div class="invoice-container">
+        <!-- Encabezado -->
+        <div class="header">
+            <img src="{{ logo_url }}" alt="Logo">
+            <h1>Factura de Compra</h1>
+        </div>
+        <!-- Detalles -->
+        <div class="details">
+            <p><strong>ID del Pedido:</strong> {{ order.id }}</p>
+            <p><strong>Fecha:</strong> {{ order.created_at }}</p>
+            <p><strong>Total:</strong> ${{ order.total|add_dot_separator }}</p>
+        </div>
+        <!-- Productos -->
+        <div class="products">
+            <h2>Productos:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ item.product.price|add_dot_separator }}</td>
+                        <td>${{ (item.product.price * item.quantity)|add_dot_separator }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Total -->
+        <div class="total">
+            <p>Total: ${{ order.total|add_dot_separator }}</p>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Seifer - Jabones Reciclados. Gracias por tu compra.</p>
+    </footer>
 </body>
 </html>

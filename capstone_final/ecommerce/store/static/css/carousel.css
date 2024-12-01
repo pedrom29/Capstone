@@ -1,0 +1,49 @@
+/* Contenedor del carrusel */
+.carousel-container {
+    margin: 20px auto; /* Centra el carrusel */
+    padding: 1rem;
+    background-color: white; /* Fondo blanco */
+    border: 2px solid #ddd; /* Borde */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra */
+    max-width: 1500px; /* Ancho máximo ajustado */
+    width: 90%; /* Responsive: ocupa el 90% del ancho del viewport */
+}
+
+/* Imágenes del carrusel */
+.carousel-inner img {
+    max-height: 500px; /* Altura máxima ajustada */
+    object-fit: cover; /* Ajusta las imágenes sin deformarlas */
+    width: 100%; /* Cubre todo el ancho del carrusel */
+}
+
+/* Indicadores del carrusel */
+.carousel-indicators li {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%; /* Indicadores circulares */
+    background-color: #ccc; /* Color de los indicadores */
+}
+
+.carousel-indicators .active {
+    background-color: #666; /* Color del indicador activo */
+}
+
+/* Botones de control */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    height: 30px; /* Tamaño aumentado de las flechas */
+    width: 30px;
+    background-size: 100%; /* Asegura que cubran todo el contenedor */
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .carousel-container {
+        max-width: 100%; /* Ocupa todo el ancho en dispositivos pequeños */
+    }
+
+    .carousel-inner img {
+        max-height: 300px; /* Reduce la altura máxima en pantallas pequeñas */
+    }
+}

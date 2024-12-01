@@ -1,0 +1,36 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body .btn {
+    margin-top: auto;
+}
+
+.container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.zoom-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: auto;
+}
+
+.zoom-image {
+    transition: transform 0.5s ease;
+    cursor: zoom-in;
+}
+
+.zoom-container:hover .zoom-image {
+    transform: scale(1.5); /* Ajusta el nivel de zoom aquí */
+}

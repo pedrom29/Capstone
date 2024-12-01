@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .models import Product, Cart, CartItem, Order, OrderItem
+from .models import Product, Cart, CartItem, Order, OrderItem, Category
 from django.contrib.sessions.models import Session
 from .forms import OrderForm
 from datetime import date, timedelta
@@ -14,9 +14,42 @@ from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.http import JsonResponse
-import random
+from random import sample 
 from random import shuffle
+from django.db.models import Count
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+import os
+from io import BytesIO
+from decimal import Decimal
+from .utils import generate_invoice_pdf
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from django.contrib import messages
+from django.db import transaction
 
+
+def login_view(request):
+    # Lógica de inicio de sesión
+    messages.success(request, "Has iniciado sesión correctamente.")
+    return redirect("login")
+
+def logout_view(request):
+    # Lógica de cierre de sesión
+    messages.success(request, "Has cerrado sesión correctamente.")
+    return redirect("login")
+
+
+def home(request):
+    # Obtén todos los productos
+    all_products = list(Product.objects.all())
+
+    # Selecciona hasta 8 productos al azar
+    featured_products = sample(all_products, min(len(all_products), 8))
+
+    return render(request, 'store/home.html', {
+        'featured_products': featured_products
+    })
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -51,7 +84,6 @@ def add_to_cart(request, product_id):
 
     return redirect('cart_detail')
 
-
 def cart_detail(request):
     if not request.session.session_key:
         request.session.create()
@@ -66,9 +98,15 @@ def cart_detail(request):
     cart_items = cart.cartitem_set.all()
     total = sum(item.product.price * item.quantity for item in cart_items)
 
+    # Método para formatear como precio en CLP
+    def format_clp(value):
+        return f"${value:,.0f}".replace(",", ".")
+
+    formatted_total = format_clp(total)
+
     return render(request, 'store/cart_detail.html', {
         'cart_items': cart_items,
-        'total': total,
+        'total': formatted_total,
     })
 
 def update_cart_item(request, item_id, action):
@@ -94,9 +132,19 @@ def remove_from_cart(request, item_id):
     return redirect('cart_detail')
 
 def product_list(request):
-    # Consulta todos los productos
-    products = Product.objects.all()
-    return render(request, 'store/product_list.html', {'products': products})
+    category_id = request.GET.get('category')  # Obtener la categoría seleccionada
+    categories = Category.objects.all()  # Obtener todas las categorías
+
+    if category_id:
+        products = Product.objects.filter(category_id=category_id)
+    else:
+        products = Product.objects.all()
+
+    return render(request, 'store/product_list.html', {
+        'products': products,
+        'categories': categories,
+    })
+
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -121,7 +169,14 @@ def checkout(request):
     if not cart_items:
         return redirect('cart_detail')  # Redirigir si el carrito está vacío
 
+    # Calcular el total y formatearlo
     total = sum(item.product.price * item.quantity for item in cart_items)
+    formatted_total = f"${total:,.0f}".replace(",", ".")
+
+    # Formatear los totales individuales de los ítems
+    for item in cart_items:
+        item.formatted_price = f"${item.product.price:,.0f}".replace(",", ".")
+        item.formatted_total = f"${(item.product.price * item.quantity):,.0f}".replace(",", ".")
 
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -155,8 +210,9 @@ def checkout(request):
     return render(request, 'store/checkout.html', {
         'form': form,
         'cart_items': cart_items,
-        'total': total,
+        'total': formatted_total,
     })
+
 
 def payment(request, order_id):
     # Buscar el pedido según el tipo de usuario
@@ -228,7 +284,6 @@ def webpay_response(request):
             'response': response
         })
     
-#Email de confirmación
 def send_confirmation_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -236,62 +291,104 @@ def send_confirmation_email(request):
 
         # Obtener los detalles del pedido
         order = get_object_or_404(Order, id=buy_order)
+
+        # Generar el PDF
+        pdf_buffer = generate_styled_invoice_pdf(order)
+
+        # Configurar el correo
         subject = f"Confirmación de Compra - Pedido {order.id}"
-        message = f"""
-        ¡Gracias por tu compra!
-        
-        Detalles del Pedido:
-        - ID del Pedido: {order.id}
-        - Fecha: {order.created_at}
-        - Total: ${order.total}
-        - Productos:
-        """
-        for item in order.items.all():
-            message += f"\n  - {item.product.name} x {item.quantity} (${item.product.price * item.quantity})"
-
-        message += f"\n\nGracias por comprar con nosotros."
-
-        # Configurar el mensaje con codificación UTF-8
+        message = "Gracias por tu compra. Adjuntamos la factura de tu pedido."
         email_message = EmailMessage(
             subject,
             message,
-            to=[email]
+            'tuemail@example.com',
+            [email],
         )
-        email_message.encoding = 'utf-8'  # Especificar codificación
+        email_message.attach(f"Factura_{order.id}.pdf", pdf_buffer.read(), 'application/pdf')
         email_message.send()
 
         return render(request, 'store/email_sent.html', {'email': email})
 
-#Descargar comprobante PDF    
+# Descargar comprobante PDF con estilos
 def download_invoice_pdf(request):
     if request.method == 'POST':
         buy_order = request.POST.get('buy_order')
         
         # Obtener el pedido
         order = Order.objects.get(id=buy_order)
-        
+
         # Crear el PDF
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Factura_{order.id}.pdf"'
 
-        # Crear el objeto canvas para generar el PDF
-        p = canvas.Canvas(response)
-        
-        # Añadir contenido al PDF
-        p.drawString(100, 800, "Factura de Compra")
-        p.drawString(100, 780, f"ID del Pedido: {order.id}")
-        p.drawString(100, 760, f"Fecha: {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
-        p.drawString(100, 740, f"Total: ${order.total}")
-        p.drawString(100, 720, "Productos:")
+        # Configurar el documento
+        doc = SimpleDocTemplate(response, pagesize=letter, rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
+        styles = getSampleStyleSheet()
 
-        y = 700
+        # Contenido del PDF
+        elements = []
+
+        # Añadir el logo
+        logo_path = os.path.join(settings.BASE_DIR, 'store/static/images/logo.png')  # Ruta absoluta al logo
+        if os.path.exists(logo_path):
+            logo = Image(logo_path, width=100, height=100)  # Ajusta el tamaño según sea necesario
+            logo.hAlign = 'LEFT'
+            elements.append(logo)
+
+        # Título
+        title = Paragraph("Factura de Compra", styles['Title'])
+        elements.append(title)
+        elements.append(Paragraph("<br/>", styles['Normal']))
+
+        # Detalles del pedido
+        order_details = [
+            ["ID del Pedido:", f"{order.id}"],
+            ["Fecha:", f"{order.created_at.strftime('%Y-%m-%d %H:%M:%S')}"],
+            ["Total:", f"${order.total:,.0f}".replace(",", ".")],
+        ]
+        table = Table(order_details, hAlign='LEFT')
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+        elements.append(Paragraph("<br/><br/>", styles['Normal']))
+
+        # Productos
+        elements.append(Paragraph("<strong>Productos:</strong>", styles['Heading2']))
+        product_data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]
         for item in order.items.all():
-            p.drawString(120, y, f"{item.product.name} x {item.quantity} - ${item.product.price * item.quantity}")
-            y -= 20
+            product_data.append([
+                item.product.name,
+                item.quantity,                
+                f"${item.product.price:,.0f}".replace(",", "."),
+                f"${item.product.price * item.quantity:,.0f}".replace(",", "."),
+            ])
 
-        # Finalizar el PDF
-        p.showPage()
-        p.save()
+        product_table = Table(product_data, hAlign='LEFT', colWidths=[200, 100, 100, 100])
+        product_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(product_table)
+        elements.append(Paragraph("<br/><br/>", styles['Normal']))
+
+        # Nota al pie
+        footer = Paragraph("&copy; 2024 Seifer - Jabones Reciclados. Gracias por tu compra.", styles['Normal'])
+        elements.append(footer)
+
+        # Construir el PDF
+        doc.build(elements)
 
         return response
 
@@ -332,8 +429,89 @@ def register_view(request):
     form = YourRegistrationForm() # type: ignore
     return render(request, 'register.html', {'form': form})
 
-def home(request):
-    products = list(Product.objects.annotate(count=Count('id')))  # Convierte el QuerySet en una lista
-    shuffle(products)  # Mezcla los productos
-    random_products = products[:4]  # Toma los primeros 4 después de mezclar
-    return render(request, 'base.html', {'random_products': random_products})
+
+def generate_styled_invoice_pdf(order):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    # Estilo del documento
+    styles = getSampleStyleSheet()
+    title_style = styles['Title']
+    subtitle_style = styles['Heading2']
+    normal_style = styles['Normal']
+
+    # Encabezado
+    logo_path = os.path.join(settings.BASE_DIR, 'store/static/images/logo.png')  # Ruta absoluta al logo
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=100, height=100)  # Ajusta el tamaño según sea necesario
+        logo.hAlign = 'LEFT'
+        elements.append(logo)
+    elements.append(Spacer(1, 20))
+    elements.append(Paragraph("Factura de Compra", title_style))
+    elements.append(Spacer(1, 20))
+
+    # Detalles del pedido
+    elements.append(Paragraph(f"<b>ID del Pedido:</b> {order.id}", normal_style))
+    elements.append(Paragraph(f"<b>Fecha:</b> {order.created_at.strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+    elements.append(Paragraph(f"<b>Total:</b> ${order.total:,.0f}".replace(",", "."), normal_style))
+    elements.append(Spacer(1, 20))
+
+    # Productos
+    elements.append(Paragraph("Productos:", subtitle_style))
+    table_data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]
+
+    for item in order.items.all():
+        table_data.append([
+            item.product.name,
+            str(item.quantity),
+            f"${item.product.price:,.0f}".replace(",", "."),
+            f"${item.product.price * item.quantity:,.0f}".replace(",", "."),
+        ])
+
+    # Tabla de productos
+    table = Table(table_data, colWidths=[200, 70, 100, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#333333")),
+        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+    ]))
+    elements.append(table)
+
+    # Espaciado final
+    elements.append(Spacer(1, 40))
+    elements.append(Paragraph("&copy; 2024 Seifer - Jabones Reciclados. Gracias por tu compra.", normal_style))
+
+    # Construir el documento
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+def process_order(request):
+    if request.method == 'POST':
+        # Obtener el carrito del usuario (puedes ajustar según tu lógica)
+        cart = get_object_or_404(Cart, user=request.user)
+
+        # Procesar cada ítem en el carrito
+        with transaction.atomic():  # Asegura que la operación sea atómica
+            for item in cart.items.all():
+                product = item.product
+                if product.stock >= item.quantity:
+                    # Reducir el stock
+                    product.stock -= item.quantity
+                    product.save()
+                else:
+                    # Opcional: manejar casos donde no hay suficiente stock
+                    return render(request, 'store/insufficient_stock.html', {
+                        'product': product
+                    })
+
+        # Vaciar el carrito después del procesamiento
+        cart.items.all().delete()
+
+        # Redirigir a una página de éxito
+        return render(request, 'store/order_success.html')

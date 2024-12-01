@@ -1,5 +1,5 @@
 {% extends "store/base.html" %}
-
+{% load custom_filters %}
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Realizar Pedido</h1>
@@ -17,8 +17,34 @@
             <h3 class="card-title">Información de Pago</h3>
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary btn-block mt-3">Pagar</button>
+                <div class="form-group">
+                    <label for="id_address">Dirección:</label>
+                    {{ form.address|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    <label for="id_comuna">Comuna:</label>
+                    {{ form.comuna|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    <label for="id_city">Ciudad:</label>
+                    {{ form.city|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    <label for="id_phone">Teléfono:</label>
+                    {{ form.phone|add_class:"form-control" }}
+                </div>
+                <div class="form-group">
+                    <label for="id_delivery_date">Fecha de Entrega:</label>
+                    <input 
+                        type="date" 
+                        id="id_delivery_date" 
+                        name="delivery_date" 
+                        class="form-control"
+                        min="" 
+                        max=""
+                    >
+                </div>
+                <button type="submit" class="btn btn-success btn-block mt-3">Pagar</button>
             </form>
         </div>
     </div>
@@ -29,23 +55,44 @@
         {% for item in cart_items %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <!-- Imagen del Producto en Miniatura -->
                 <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-thumbnail mr-3" style="width: 50px; height: 50px; object-fit: cover;">
-                <!-- Detalles del Producto -->
                 <div>
                     <strong>{{ item.product.name }}</strong><br>
-                    ${{ item.product.price }} x {{ item.quantity }}
+                    {{ item.product.formatted_price }} x {{ item.quantity }}
                 </div>
             </div>
-            <!-- Total por Producto -->
-            <span>Total: ${{ item.get_total_price }}</span>
+            <span>Total: {{ item.get_total_price|floatformat:0|add_dot_separator }}</span>
         </li>
         {% endfor %}
     </ul>
     
-    <!-- Total del Carrito -->
     <div class="text-right">
-        <h4>Total a Pagar: ${{ total }}</h4>
+        <h4>Total a Pagar: {{ total }}</h4>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const deliveryDateInput = document.getElementById("id_delivery_date");
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 7);
+        
+        // Formato de fecha yyyy-mm-dd
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        deliveryDateInput.min = formatDate(today);
+        deliveryDateInput.max = formatDate(maxDate);
+
+        // Abrir calendario al hacer clic en cualquier lugar del campo
+        deliveryDateInput.addEventListener("click", function() {
+            deliveryDateInput.showPicker(); // Forzar apertura del calendario
+        });
+    });
+</script>
 {% endblock %}
